@@ -22,7 +22,7 @@ const releaseUrl = release?.html_url;
 
 <Layout title="DDEV Manager - A Beautiful GUI for DDEV">
   <Header version={version} />
-  <main>
+  <main id="main">
     <Hero version={version} releaseDate={releaseDate} downloads={downloads} />
     <Features />
     <Downloads version={version} downloads={downloads} changelog={changelog} releaseUrl={releaseUrl} />

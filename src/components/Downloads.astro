@@ -49,8 +49,8 @@ const platforms = [
         Download DDEV Manager
       </h2>
       {version && (
-        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
-          Latest version: <span class="font-semibold text-primary-600 dark:text-primary-400">{version}</span>
+        <p class="mt-2 text-lg text-gray-600 dark:text-gray-300">
+          Latest version: <span class="font-semibold text-primary-700 dark:text-primary-400">{version}</span>
         </p>
       )}
     </div>
@@ -83,7 +83,7 @@ const platforms = [
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{platform.name}</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">{platform.description}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-300">{platform.description}</p>
             </div>
           </div>
 
@@ -92,16 +92,16 @@ const platforms = [
             {platform.download ? (
               <a
                 href={platform.download.url}
-                class="flex items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-2.5 font-medium text-white transition-colors hover:bg-primary-600"
+                class="flex items-center justify-center gap-2 rounded-lg bg-primary-700 px-4 py-2.5 font-medium text-white transition-colors hover:bg-primary-800"
               >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Download {platform.download.label}
-                <span class="text-sm opacity-75">({formatBytes(platform.download.size)})</span>
+                <span class="text-sm">({formatBytes(platform.download.size)})</span>
               </a>
             ) : (
-              <span class="text-center text-sm text-gray-500 dark:text-gray-400">
+              <span class="text-center text-sm text-gray-500 dark:text-gray-300">
                 No release available
               </span>
             )}
@@ -117,7 +117,7 @@ const platforms = [
 
           <!-- Installation note -->
           {platform.note && (
-            <p class="mt-4 text-xs text-gray-500 dark:text-gray-500">
+            <p class="mt-4 text-xs text-gray-500 dark:text-gray-300">
               {platform.note}
             </p>
           )}
@@ -131,21 +131,21 @@ const platforms = [
       <div class="mt-4 grid gap-6 md:grid-cols-2">
         <div>
           <h4 class="font-medium text-gray-900 dark:text-white">macOS Gatekeeper</h4>
-          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
             The app is not signed with an Apple Developer certificate. On first launch:
           </p>
-          <ol class="mt-2 list-inside list-decimal text-sm text-gray-600 dark:text-gray-400">
+          <ol class="mt-2 list-inside list-decimal text-sm text-gray-600 dark:text-gray-300">
             <li>Right-click the app and select "Open"</li>
             <li>Click "Open" in the dialog</li>
           </ol>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Or via terminal:</p>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Or via terminal:</p>
           <code class="mt-1 block rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-900">
             xattr -d com.apple.quarantine /Applications/DDEV\ Manager.app
           </code>
         </div>
         <div>
           <h4 class="font-medium text-gray-900 dark:text-white">Linux Graphics Issues</h4>
-          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
             If you experience graphics issues with the AppImage, try forcing X11:
           </p>
           <code class="mt-2 block rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-900">
@@ -172,12 +172,12 @@ const platforms = [
           </div>
         </details>
         {releaseUrl && (
-          <p class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p class="mt-4 text-center text-sm text-gray-500 dark:text-gray-300">
             <a
               href={releaseUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-primary-600 hover:underline dark:text-primary-400"
+              class="text-primary-700 underline decoration-primary-700/50 hover:decoration-primary-700 dark:text-primary-400 dark:decoration-primary-400/50 dark:hover:decoration-primary-400"
             >
               View full release notes on GitHub
             </a>
