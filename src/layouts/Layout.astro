@@ -28,13 +28,13 @@ const base = import.meta.env.BASE_URL;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content={`${base}images/screenshot-dark.png`} />
+    <meta property="og:image" content={`${base}images/screenshot-dark-1.png`} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${base}images/screenshot-dark.png`} />
+    <meta name="twitter:image" content={`${base}images/screenshot-dark-1.png`} />
 
     <link rel="icon" type="image/png" href={`${base}images/logo.png`} />
     <title>{title}</title>
@@ -46,6 +46,15 @@ const base = import.meta.env.BASE_URL;
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
       }
+      // Preload hero LCP image based on detected theme
+      var p = theme === 'dark' ? 'screenshot-dark-' : 'screenshot-';
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.type = 'image/webp';
+      link.imageSrcset = '/images/' + p + '1-sm.webp 696w, /images/' + p + '1-md.webp 1050w, /images/' + p + '1.webp 1392w';
+      link.imageSizes = '(min-width: 1024px) 50vw, 100vw';
+      document.head.appendChild(link);
     </script>
 
     <!-- Analytics -->
@@ -66,6 +75,7 @@ const base = import.meta.env.BASE_URL;
       function toggleTheme() {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        document.dispatchEvent(new CustomEvent('themechange', { detail: { dark: isDark } }));
       }
 
       // Make available globally

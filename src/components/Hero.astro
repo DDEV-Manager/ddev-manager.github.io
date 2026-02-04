@@ -69,38 +69,44 @@ const base = import.meta.env.BASE_URL;
         <p id="platform-info" class="mt-4 text-sm text-gray-500 dark:text-gray-300"></p>
       </div>
 
-      <!-- Screenshot with 3D perspective -->
+      <!-- Screenshot slideshow with 3D perspective -->
       <div class="relative hero-perspective">
         <div class="hero-screenshot">
-          <div class="relative rounded-xl shadow-2xl ring-1 ring-gray-900/10 dark:ring-white/10">
-            <!-- Dark mode screenshot (visible in dark mode) -->
-            <picture class="hidden dark:block">
-              <source srcset={`${base}images/screenshot-dark.webp`} type="image/webp" />
+          <div class="relative rounded-xl shadow-2xl ring-1 ring-gray-900/10 dark:ring-white/10" aria-roledescription="carousel" aria-label="Application screenshots">
+            {/* Slide 1 — eagerly loaded, light-theme srcset directly on <img> */}
+            <div class="hero-slide hero-slide--active" aria-roledescription="slide" aria-label="Screenshot 1 of 6">
               <img
-                src={`${base}images/screenshot-dark.png`}
-                alt="DDEV Manager screenshot"
-                width="1400"
-                height="857"
+                src={`${base}images/screenshot-1.png`}
+                srcset={`${base}images/screenshot-1-sm.webp 696w, ${base}images/screenshot-1-md.webp 1050w, ${base}images/screenshot-1.webp 1392w`}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                alt="DDEV Manager screenshot 1"
+                width="1392"
+                height="1522"
                 class="w-full rounded-xl"
                 loading="eager"
                 decoding="async"
                 fetchpriority="high"
               />
-            </picture>
-            <!-- Light mode screenshot (visible in light mode) -->
-            <picture class="block dark:hidden">
-              <source srcset={`${base}images/screenshot-light.webp`} type="image/webp" />
-              <img
-                src={`${base}images/screenshot-light.png`}
-                alt="DDEV Manager screenshot"
-                width="1400"
-                height="857"
-                class="w-full rounded-xl"
-                loading="eager"
-                decoding="async"
-                fetchpriority="high"
-              />
-            </picture>
+            </div>
+            {/* Slides 2-6 — deferred via data-* attributes */}
+            {[2, 3, 4, 5, 6].map((i) => (
+              <div
+                class="hero-slide absolute inset-0"
+                aria-roledescription="slide"
+                aria-label={`Screenshot ${i} of 6`}
+                aria-hidden="true"
+              >
+                <img
+                  data-srcset={`${base}images/screenshot-${i}-sm.webp 696w, ${base}images/screenshot-${i}-md.webp 1050w, ${base}images/screenshot-${i}.webp 1392w`}
+                  data-sizes="(min-width: 1024px) 50vw, 100vw"
+                  alt={`DDEV Manager screenshot ${i}`}
+                  width="1392"
+                  height="1522"
+                  class="w-full rounded-xl"
+                  decoding="async"
+                />
+              </div>
+            ))}
           </div>
         </div>
         <!-- Decorative elements -->
@@ -146,10 +152,25 @@ const base = import.meta.env.BASE_URL;
     }
   }
 
+  .hero-slide {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    pointer-events: none;
+  }
+
+  .hero-slide--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* Reduce motion for users who prefer it */
   @media (prefers-reduced-motion: reduce) {
     .hero-screenshot {
       animation: none;
+    }
+
+    .hero-slide {
+      transition: opacity 0.01s;
     }
   }
 </style>
@@ -170,5 +191,81 @@ const base = import.meta.env.BASE_URL;
     if (platform) {
       platformInfo.textContent = `${platform} - scroll down for your download`;
     }
+  }
+
+  // Hero slideshow
+  const slides = document.querySelectorAll<HTMLElement>('.hero-slide');
+  if (slides.length > 1) {
+    let current = 0;
+    let timer: ReturnType<typeof setInterval>;
+    const screenshotEl = document.querySelector('.hero-screenshot');
+
+    // Swap hero image srcset between light/dark theme variants
+    function setHeroTheme(isDark: boolean) {
+      document.querySelectorAll<HTMLImageElement>('.hero-slide img').forEach((img) => {
+        const srcset = img.srcset || img.dataset.srcset;
+        const src = img.src || img.dataset.src;
+        if (!srcset && !src) return;
+        if (isDark) {
+          if (srcset) img.srcset = srcset.replace(/\/screenshot-(\d)/g, '/screenshot-dark-$1');
+          if (img.src) img.src = img.src.replace(/\/screenshot-(\d)/g, '/screenshot-dark-$1');
+          if (img.dataset.srcset) img.dataset.srcset = img.dataset.srcset.replace(/\/screenshot-(\d)/g, '/screenshot-dark-$1');
+        } else {
+          if (srcset) img.srcset = srcset.replace(/\/screenshot-dark-(\d)/g, '/screenshot-$1');
+          if (img.src) img.src = img.src.replace(/\/screenshot-dark-(\d)/g, '/screenshot-$1');
+          if (img.dataset.srcset) img.dataset.srcset = img.dataset.srcset.replace(/\/screenshot-dark-(\d)/g, '/screenshot-$1');
+        }
+      });
+    }
+
+    // On load, sync if dark mode is active
+    if (document.documentElement.classList.contains('dark')) setHeroTheme(true);
+
+    // Listen for manual theme toggles
+    document.addEventListener('themechange', ((e: CustomEvent) => {
+      setHeroTheme(e.detail.dark);
+    }) as EventListener);
+
+    // Activate deferred images (slides 2-6) before first transition at 4s
+    setTimeout(() => {
+      slides.forEach((slide, idx) => {
+        if (idx === 0) return;
+        slide.querySelectorAll<HTMLImageElement>('img[data-srcset]').forEach((img) => {
+          img.srcset = img.dataset.srcset!;
+          img.sizes = img.dataset.sizes!;
+        });
+      });
+    }, 1500);
+
+    function advance() {
+      const prev = slides[current];
+      current = (current + 1) % slides.length;
+      const next = slides[current];
+      prev.classList.remove('hero-slide--active');
+      prev.setAttribute('aria-hidden', 'true');
+      next.classList.add('hero-slide--active');
+      next.removeAttribute('aria-hidden');
+    }
+
+    function start() {
+      timer = setInterval(advance, 4000);
+    }
+
+    function stop() {
+      clearInterval(timer);
+    }
+
+    start();
+
+    // Pause on hover (matches float animation pause)
+    if (screenshotEl) {
+      screenshotEl.addEventListener('mouseenter', stop);
+      screenshotEl.addEventListener('mouseleave', start);
+    }
+
+    // Pause when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop(); else start();
+    });
   }
 </script>
