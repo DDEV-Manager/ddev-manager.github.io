@@ -163,6 +163,14 @@ const base = import.meta.env.BASE_URL;
     pointer-events: auto;
   }
 
+  /* Reduce padding on short viewports (laptops) so hero fits in one screen */
+  @media (max-height: 900px) and (min-width: 1024px) {
+    section {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+  }
+
   /* Reduce motion for users who prefer it */
   @media (prefers-reduced-motion: reduce) {
     .hero-screenshot {

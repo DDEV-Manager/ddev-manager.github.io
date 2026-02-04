@@ -22,6 +22,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 html {
+  font-size: 125%;
   font-family: var(--font-sans);
   scroll-behavior: smooth;
 }
